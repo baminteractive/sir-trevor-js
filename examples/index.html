@@ -51,11 +51,11 @@
           "Quote",
           "Image",
           "Video",
-          "Tweet"
         ]
       });
 
       $('form').bind('submit', function(){
+        console.log('Form Data: ', $(this).closest('form').serializeArray());
         return false;
       });
 
