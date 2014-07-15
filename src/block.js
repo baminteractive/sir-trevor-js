@@ -113,6 +113,7 @@ SirTrevor.Block = (function(){
       if (this.uploadable) { this.withMixin(SirTrevor.BlockMixins.Uploadable); }
       if (this.fetchable) { this.withMixin(SirTrevor.BlockMixins.Fetchable); }
       if (this.controllable) { this.withMixin(SirTrevor.BlockMixins.Controllable); }
+      if (this.markdownable) { this.withMixin(SirTrevor.BlockMixins.Markdownable); }
 
       if (this.formattable) { this._initFormatting(); }
 

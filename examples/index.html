@@ -21,7 +21,9 @@
 <body>
   <form>
     <div class="errors"></div>
-    <textarea class="sir-trevor" name="content"></textarea>
+<!-- <textarea class="sir-trevor" name="content">{"data":[{"type":"image_link","data":{"url":"http://placekitten.com/300/300"}}]}</textarea> -->
+    <textarea class="sir-trevor" name="content">{"data":[{"type":"text","data":{"text":"test markdown\nthis is **bold** and _italic_ \nthis is a [link](http://google.com)\n"}}]}</textarea>
+    <!-- <textarea class="sir-trevor" name="content"></textarea> -->
     <input type="submit" value="Submit">
   </form>
 
@@ -45,13 +47,10 @@
       window.editor = new SirTrevor.Editor({
         el: $('.sir-trevor'),
         blockTypes: [
-          "Heading",
           "Text",
-          "List",
-          "Quote",
-          "Image",
           "ImageLink"
-        ]
+        ],
+        blockLimit: 1
       });
 
       $('form').bind('submit', function(){

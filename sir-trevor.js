@@ -4,7 +4,7 @@
  * Released under the MIT license
  * www.opensource.org/licenses/MIT
  *
- * 2014-07-14
+ * 2014-07-15
  */
 
 (function ($, _){
@@ -935,6 +935,36 @@
     }
   
   };
+  SirTrevor.BlockMixins.Markdownable = {
+  
+    mixinName: "Markdownable",
+    showMarkdown: false,
+  
+    initializeMarkdownable: function() {
+      SirTrevor.log("Adding Markdownable to block " + this.blockID);
+      this.$control_ui = $('<div>', {'class': 'st-block__control-ui'});
+      
+      this.addUiControl('text', _.bind(this.toggleHandler, this));
+      this.$inner.append(this.$control_ui);
+    },
+  
+    toggleHandler: function() {
+      this.showMarkdown = !this.showMarkdown;
+      this.loadData(this.blockStorage.data);
+    },
+  
+    getControlTemplate: function(cmd) {
+      return $("<a>",
+        { 'data-icon': cmd,
+          'class': 'st-icon st-block-control-ui-btn st-block-control-ui-btn--' + cmd
+        });
+    },
+  
+    addUiControl: function(cmd, handler) {
+      this.$control_ui.append(this.getControlTemplate(cmd));
+      this.$control_ui.on('click', '.st-block-control-ui-btn--' + cmd, handler);
+    }
+  };
   SirTrevor.BlockMixins.Pastable = {
   
     mixinName: "Pastable",
@@ -1535,6 +1565,7 @@
         if (this.uploadable) { this.withMixin(SirTrevor.BlockMixins.Uploadable); }
         if (this.fetchable) { this.withMixin(SirTrevor.BlockMixins.Fetchable); }
         if (this.controllable) { this.withMixin(SirTrevor.BlockMixins.Controllable); }
+        if (this.markdownable) { this.withMixin(SirTrevor.BlockMixins.Markdownable); }
   
         if (this.formattable) { this._initFormatting(); }
   
@@ -1992,6 +2023,8 @@
   
     type: "text",
   
+    markdownable: true,
+  
     title: function() { return i18n.t('blocks:text:title'); },
   
     editorHTML: '<div class="st-required st-text-block" contenteditable="true"></div>',
@@ -1999,7 +2032,12 @@
     icon_name: 'text',
   
     loadData: function(data){
-      this.getTextBlock().html(SirTrevor.toHTML(data.text, this.type));
+    	console.log(this)
+    	if(this.showMarkdown){
+    		this.getTextBlock().html(data.text);
+    	} else {
+      	this.getTextBlock().html(SirTrevor.toHTML(data.text, this.type));
+    	}
     }
   });
   SirTrevor.Blocks.Tweet = (function(){
