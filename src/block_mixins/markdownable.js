@@ -12,6 +12,7 @@ SirTrevor.BlockMixins.Markdownable = {
   },
 
   toggleHandler: function() {
+    this.toData();
     this.showMarkdown = !this.showMarkdown;
     this.loadData(this.blockStorage.data);
   },
@@ -26,5 +27,50 @@ SirTrevor.BlockMixins.Markdownable = {
   addUiControl: function(cmd, handler) {
     this.$control_ui.append(this.getControlTemplate(cmd));
     this.$control_ui.on('click', '.st-block-control-ui-btn--' + cmd, handler);
+  },
+
+  toData: function() {
+    SirTrevor.log("markdownable toData for " + this.blockID);
+
+    var bl = this.$el,
+        dataObj = {};
+
+    /* Simple to start. Add conditions later */
+    if (this.hasTextBlock()) {
+      var content = this.getTextBlock().html();
+      if (content.length > 0) {
+        if(this.showMarkdown){
+          dataObj.text = content.replace("<br>", "\n").replace(/<\/?[^>]+(>|$)/g, "");
+        } else {
+          dataObj.text = SirTrevor.toMarkdown(content, this.type);
+        }
+      }
+    }
+
+    // Add any inputs to the data attr
+    if(this.$(':input').not('.st-paste-block').length > 0) {
+      this.$(':input').each(function(index,input){
+        if (input.getAttribute('name')) {
+          dataObj[input.getAttribute('name')] = input.value;
+        }
+      });
+    }
+
+    // Set
+    if(!_.isEmpty(dataObj)) {
+      this.setData(dataObj);
+    }
+  },
+
+  getPreviewHTML: function(text) {
+    var previewHTML;
+    text = text || '';
+    
+    if(this.showMarkdown){
+      previewHTML = '<pre>' + text + '</pre>';
+    } else {
+      previewHTML = SirTrevor.toHTML(text, this.type)
+    }
+    return previewHTML;
   }
 };

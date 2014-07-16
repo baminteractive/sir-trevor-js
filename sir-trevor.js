@@ -4,7 +4,7 @@
  * Released under the MIT license
  * www.opensource.org/licenses/MIT
  *
- * 2014-07-15
+ * 2014-07-16
  */
 
 (function ($, _){
@@ -949,6 +949,7 @@
     },
   
     toggleHandler: function() {
+      this.toData();
       this.showMarkdown = !this.showMarkdown;
       this.loadData(this.blockStorage.data);
     },
@@ -963,6 +964,51 @@
     addUiControl: function(cmd, handler) {
       this.$control_ui.append(this.getControlTemplate(cmd));
       this.$control_ui.on('click', '.st-block-control-ui-btn--' + cmd, handler);
+    },
+  
+    toData: function() {
+      SirTrevor.log("markdownable toData for " + this.blockID);
+  
+      var bl = this.$el,
+          dataObj = {};
+  
+      /* Simple to start. Add conditions later */
+      if (this.hasTextBlock()) {
+        var content = this.getTextBlock().html();
+        if (content.length > 0) {
+          if(this.showMarkdown){
+            dataObj.text = content.replace("<br>", "\n").replace(/<\/?[^>]+(>|$)/g, "");
+          } else {
+            dataObj.text = SirTrevor.toMarkdown(content, this.type);
+          }
+        }
+      }
+  
+      // Add any inputs to the data attr
+      if(this.$(':input').not('.st-paste-block').length > 0) {
+        this.$(':input').each(function(index,input){
+          if (input.getAttribute('name')) {
+            dataObj[input.getAttribute('name')] = input.value;
+          }
+        });
+      }
+  
+      // Set
+      if(!_.isEmpty(dataObj)) {
+        this.setData(dataObj);
+      }
+    },
+  
+    getPreviewHTML: function(text) {
+      var previewHTML;
+      text = text || '';
+      
+      if(this.showMarkdown){
+        previewHTML = '<pre>' + text + '</pre>';
+      } else {
+        previewHTML = SirTrevor.toHTML(text, this.type)
+      }
+      return previewHTML;
     }
   };
   SirTrevor.BlockMixins.Pastable = {
@@ -2032,12 +2078,7 @@
     icon_name: 'text',
   
     loadData: function(data){
-    	console.log(this)
-    	if(this.showMarkdown){
-    		this.getTextBlock().html(data.text);
-    	} else {
-      	this.getTextBlock().html(SirTrevor.toHTML(data.text, this.type));
-    	}
+    	this.getTextBlock().html(this.getPreviewHTML(data.text));
     }
   });
   SirTrevor.Blocks.Tweet = (function(){
